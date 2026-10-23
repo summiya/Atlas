@@ -1,3 +1,59 @@
+<div align="center">
+
+# 🌌 Atlas
+
+### Discover · Ingest · Process · Index · Search
+
+**A vision for reliable, distributed document ingestion and search at scale.**
+
+![Project status](https://img.shields.io/badge/status-architecture%20%26%20planning-8b5cf6?style=for-the-badge) ![Core](https://img.shields.io/badge/core-PostgreSQL%20%2B%20Milvus-06b6d4?style=for-the-badge) ![Search](https://img.shields.io/badge/Azure%20AI%20Search-optional-f472b6?style=for-the-badge)
+
+*Build the pipeline. Preserve the truth. Make every document discoverable.*
+
+</div>
+
+> [!IMPORTANT]
+> **Atlas is a planned system, not an implemented application.** The screenshots below are **illustrative UI concepts using fictional sample data**, not captures of a working service. The repository currently contains architecture documentation only. Implementation starts after the Nexus project reaches its planned completion milestone.
+
+## ✨ What Atlas could look like
+
+A proposed visual direction for a future Atlas operations console: deep-indigo surfaces, aurora gradients, high-contrast telemetry, and calm, actionable pipeline statuses. The concepts are **not implemented UI features**.
+
+### 📊 Mission control — ingestion at a glance
+
+![Concept UI for future Atlas overview dashboard](docs/images/atlas-dashboard-concept.svg)
+
+*Concept only — fictional discovery, processing, and indexing metrics.*
+
+### 🔀 Pipeline orchestration — follow the data
+
+![Concept UI for future Atlas ingestion pipeline monitoring](docs/images/atlas-pipeline-concept.svg)
+
+*Concept only — illustrative stages, job queues, progress and retry visibility.*
+
+### 🔎 Document search — retrieve with context
+
+![Concept UI for future Atlas search experience](docs/images/atlas-search-concept.svg)
+
+*Concept only — illustrative search results and placeholder documents.*
+
+### 🎨 Proposed interface palette
+
+| Surface | Color | Intended use |
+| --- | --- | --- |
+| 🌌 Midnight | `#10152C` | Main app canvas |
+| 💜 Iris | `#8573FF` | Focus and interactive accents |
+| 🩵 Aurora | `#5BE4F0` | Discovery and activity |
+| 🌱 Mint | `#5EE0B4` | Healthy stages |
+| 🌺 Orchid | `#EF6DB6` | Secondary accent and notices |
+
+**Design artifacts:** [Dashboard](docs/images/atlas-dashboard-concept.svg) · [Pipelines](docs/images/atlas-pipeline-concept.svg) · [Search](docs/images/atlas-search-concept.svg)
+
+---
+
+<details>
+<summary><strong>📐 Full architecture, engineering roadmap and technical notes</strong></summary>
+
 # Atlas — Distributed Document Ingestion & Search
 
 > **Discover. Ingest. Process. Index. Search — at scale.**
@@ -269,3 +325,5 @@ A license, contribution policy, security reporting guidance, and supported relea
 ---
 
 **Atlas: distributed ingestion first, reliable search second, measurable scale throughout.**
+
+</details>
