@@ -4,10 +4,11 @@ This milestone provides **only** a bootable control-plane skeleton and **persist
 
 ## Run locally
 
-Requires Docker Engine with Compose v2.
+Requires Docker Engine with Compose v2. Create a local database password file before starting. It is ignored by Git.
 
 ```bash
-cp .env.example .env
+mkdir -p .secrets
+python -c "import secrets,pathlib;pathlib.Path('.secrets/db_password').write_text(secrets.token_urlsafe(32), encoding='utf-8')"
 docker compose up --build -d
 docker compose ps
 curl http://localhost:8000/health/live
@@ -25,7 +26,13 @@ curl -X POST http://localhost:8000/v1/sources \
 curl http://localhost:8000/v1/sources
 ```
 
-Stop without removing DB data: `docker compose down`. Remove demo data with `docker compose down -v`.
+Stop without removing DB data: `docker compose down`. Remove demo data with `docker compose down -v`. Changing the secret file does **not** change the password of an existing PostgreSQL volume; reset the volume only when you intentionally want to discard local data.
+
+## Why is the database connection not in app.py?
+
+`backend/atlas/database.py` constructs a SQLAlchemy URL internally from host, port, name, user and password file. Only **non-secret** database settings are supplied via the Compose environment. The password is read from a Compose-mounted secret file. Neither a password nor a full database URL is hardcoded or placed in the API environment. Never log the connection URL or mount secrets into publicly accessible paths.
+
+This is a **local development** setup, not production secret management. In production use a managed secret provider, restricted network connectivity and role-specific DB permissions.
 
 ## Endpoints
 
@@ -41,11 +48,12 @@ Stop without removing DB data: `docker compose down`. Remove demo data with `doc
 ## Architecture boundaries
 
 - FastAPI is the control plane; PostgreSQL owns source configuration metadata.
-- `backend/atlas/connectors.py` defines `check`, `discover`, `fetch` and a typed `SourceItem` as the contract for later S3 implementation.
-- S3 credentials are **not accepted** in source payloads. A secrets reference / IAM role design must be added before real source connections.
-- No background work is triggered by API calls in this milestone.
-- Schema is bootstrapped by SQLAlchemy `create_all`, **not versioned migrations**. Add Alembic migrations before schema evolution or production deployments.
-- **Development only:** there is no authentication or multi-tenancy, no TLS, and the local DB password is for Compose use only. Do not expose this API publicly.
+- `backend/atlas/database.py` owns the connection construction and session factory.
+- `backend/atlas/connectors.py` defines `check`, `discover`, `fetch` and a typed `SourceItem`.
+- S3 credentials are **not accepted** in source payloads. A secrets reference / IAM role design must be added before real connections.
+- No background work is triggered by API calls.
+- Schema is bootstrapped by SQLAlchemy `create_all`, **not versioned migrations**. Add Alembic before schema evolution or production deployments.
+- **Development only:** no authentication, no multi-tenancy, and no TLS. Do not expose the API publicly.
 
 ## Tests
 
@@ -55,8 +63,8 @@ python -m pip install -e '.[test]'
 python -m pytest -q
 ```
 
-The smoke test uses an isolated SQLite database to verify the API contract. PostgreSQL integration tests should be added in the next milestone.
+The smoke test uses isolated SQLite to verify the API contract. PostgreSQL integration tests should be added next.
 
 ## Next milestone
 
-Implement S3 identity/permission checks, bucket discovery with pagination and durable cursors, safe object reads, first ingestion run model, and real PostgreSQL integration tests. After that add extraction, chunking, embeddings and Milvus.
+Implement S3 identity/permission checks, bucket discovery with pagination and durable cursors, safe object reads and a first ingestion run model.
