@@ -1,8 +1,4 @@
 """API contract smoke tests with SQLite isolated from PostgreSQL."""
-import os
-
-os.environ.setdefault("ATLAS_DATABASE_URL", "sqlite+pysqlite:///:memory:")
-
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
