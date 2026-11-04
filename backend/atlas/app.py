@@ -5,21 +5,11 @@ from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import DateTime, String, create_engine, select, text
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import DateTime, String, select, text
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 from .connectors import S3SourceConfig
-
-
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="ATLAS_", extra="ignore")
-    database_url: str = "postgresql+psycopg://atlas:atlas@localhost:5432/atlas"
-
-
-settings = Settings()
-engine = create_engine(settings.database_url, pool_pre_ping=True)
-SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
+from .database import get_engine, get_session_factory
 
 
 class Base(DeclarativeBase):
@@ -55,7 +45,7 @@ class SourceRead(BaseModel):
 
 
 def db_session():
-    with SessionLocal() as session:
+    with get_session_factory()() as session:
         yield session
 
 
@@ -70,7 +60,7 @@ def serialize_source(source: Source) -> SourceRead:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Bootstrap only. Replace create_all with Alembic migrations before production deployment.
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=get_engine())
     yield
 
 
