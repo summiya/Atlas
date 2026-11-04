@@ -4,7 +4,9 @@ services:
     environment:
       POSTGRES_DB: atlas
       POSTGRES_USER: atlas
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atlas_local_only}
+      POSTGRES_PASSWORD_FILE: /run/secrets/atlas_db_password
+    secrets:
+      - atlas_db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -13,15 +15,27 @@ services:
       timeout: 3s
       retries: 15
     restart: unless-stopped
+
   api:
     build: ./backend
     environment:
-      ATLAS_DATABASE_URL: postgresql+psycopg://atlas:${POSTGRES_PASSWORD:-atlas_local_only}@db:5432/atlas
+      ATLAS_DB_HOST: db
+      ATLAS_DB_PORT: "5432"
+      ATLAS_DB_NAME: atlas
+      ATLAS_DB_USER: atlas
+      ATLAS_DB_PASSWORD_FILE: /run/secrets/atlas_db_password
+    secrets:
+      - atlas_db_password
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
+
+secrets:
+  atlas_db_password:
+    file: ./.secrets/db_password
+
 volumes:
   postgres_data:
